@@ -9,6 +9,7 @@ from playwright.sync_api import sync_playwright, Page, Browser, BrowserContext
 
 from pages.dashboard_page import DashboardPage
 from pages.login_page import LoginPage
+from pages.new_purchase_order_page import NewPurchaseOrderPage
 from pages.product_page import ProductPage
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
@@ -173,6 +174,18 @@ def pytest_runtest_makereport(item, call):
                 print(f"[INFO] Skipping video cleanup: {e}")
 
 
+@pytest.fixture
+def test_context():
+    class Ctx:
+        product_type = None
+        product_unit = None
+        product_group = None
+        product_supplier = None
+        product = None
+
+    return Ctx()
+
+
 @pytest.fixture(scope="function")
 def login_page(page: Page) -> LoginPage:
     return LoginPage(page)
@@ -186,3 +199,8 @@ def dashboard_page(page: Page) -> DashboardPage:
 @pytest.fixture(scope="function")
 def product_page(page: Page) -> ProductPage:
     return ProductPage(page)
+
+
+@pytest.fixture(scope="function")
+def new_purchase_order_page(page: Page) -> NewPurchaseOrderPage:
+    return NewPurchaseOrderPage(page)

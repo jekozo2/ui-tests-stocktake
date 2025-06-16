@@ -1,4 +1,6 @@
-from playwright.sync_api import Page
+import logging
+
+from playwright.sync_api import Page, expect
 
 from pages.base_page import BasePage
 
@@ -22,3 +24,11 @@ class DashboardPage(BasePage):
         self.stores_side_menu_button = page.locator("//div[@class='sidebar-menu']//span[text()='Stores']")
         self.logout_side_menu_button = page.locator("//div[@class='sidebar-menu']//span[text()='Logout']")
         self.success_message = page.locator(".success-message")
+        self.new_purchase_order_module_header_text = page.locator("#newPurchaseHeaderText")
+
+    def navigate_to_new_purchase_order_from_dashboard(self):
+        logging.info("Navigate to New Purchase Order from Dashboard.")
+
+        self.purchase_orders_side_menu_button.click()
+        self.new_purchase_order_side_menu_button.click()
+        expect(self.new_purchase_order_module_header_text).to_be_visible(timeout=10000)

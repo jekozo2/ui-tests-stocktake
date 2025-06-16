@@ -2,6 +2,7 @@ import logging
 
 from playwright.sync_api import Page
 
+from modules.product import Product
 from modules.product_group import ProductGroup
 from modules.product_supplier import ProductSupplier
 from modules.product_type import ProductType
@@ -10,7 +11,6 @@ from pages.dashboard_page import DashboardPage
 
 
 class ProductPage(DashboardPage):
-
     PRODUCT_TYPE_DROPDOWN_SELECTOR = "#productType"
     PRODUCT_UNIT_DROPDOWN_SELECTOR = "#productUnit"
     PRODUCT_GROUP_DROPDOWN_SELECTOR = "#productGroup"
@@ -37,7 +37,12 @@ class ProductPage(DashboardPage):
         self.create_unit_button = page.locator("#createUnitBtn")
         self.create_group_button = page.locator("#createGroupBtn")
         self.create_supplier_button = page.locator("#createSupplierBtn")
+        self.create_product_button = page.locator("#createProductBtn")
+        self.product_name_input = page.locator("#productName")
         self.product_type_dropdown = page.locator(self.PRODUCT_TYPE_DROPDOWN_SELECTOR)
+        self.product_unit_dropdown = page.locator(self.PRODUCT_UNIT_DROPDOWN_SELECTOR)
+        self.product_group_dropdown = page.locator(self.PRODUCT_GROUP_DROPDOWN_SELECTOR)
+        self.product_supplier_dropdown = page.locator(self.PRODUCT_SUPPLIER_DROPDOWN_SELECTOR)
 
     def create_new_type(self, product_type: ProductType):
         """
@@ -47,7 +52,7 @@ class ProductPage(DashboardPage):
         :param product_type: the Product Type dataclass providing the respective data.
         """
 
-        logging.info("Open the New Type Sub-Module from the Product Module.")
+        logging.info("Create new Type from New Product Module -> New Type Sub-Module.")
         self.add_new_type_button.click()
         self.new_type_name_input.fill(product_type.name)
         self.new_type_description_input.fill(product_type.description)
@@ -61,7 +66,7 @@ class ProductPage(DashboardPage):
         :param product_unit: the Product Unit dataclass providing the respective data.
         """
 
-        logging.info("Open the New Unit Sub-Module from the Product Module.")
+        logging.info("Create new Unit from New Product Module -> New Unit Sub-Module.")
         self.add_new_unit_button.click()
         self.new_unit_name_input.fill(product_unit.name)
         self.new_unit_yield_input.fill(str(product_unit.unit_yield))
@@ -76,7 +81,7 @@ class ProductPage(DashboardPage):
         :param product_group: the Product Group dataclass providing the respective data.
         """
 
-        logging.info("Open the New Group Sub-Module from the Product Module.")
+        logging.info("Create new Group from New Product Module -> New Group Sub-Module.")
         self.add_new_group_button.click()
         self.new_group_name_input.fill(product_group.name)
         self.new_group_description_input.fill(product_group.description)
@@ -90,8 +95,24 @@ class ProductPage(DashboardPage):
         :param product_supplier: the Product Supplier dataclass providing the respective data.
         """
 
-        logging.info("Open the New Supplier Sub-Module from the Product Module.")
+        logging.info("Create new Supplier from New Product Module -> New Supplier Sub-Module.")
         self.add_new_supplier_button.click()
         self.new_supplier_name_input.fill(product_supplier.name)
         self.new_supplier_email_input.fill(product_supplier.email)
         self.create_supplier_button.click()
+
+    def create_new_product(self, product: Product):
+        """
+        The method is used to create new Product, by clicking on the New Product module,
+        filling the respective fields and clicking 'Create Product' button.
+
+        :param product: the Product dataclass providing the respective data.
+        """
+
+        logging.info("Create new Product from New Product Module.")
+        self.product_name_input.fill(product.name)
+        self.product_type_dropdown.select_option(product.type)
+        self.product_unit_dropdown.select_option(product.unit)
+        self.product_group_dropdown.select_option(product.group)
+        self.product_supplier_dropdown.select_option(product.supplier)
+        self.create_product_button.click()
