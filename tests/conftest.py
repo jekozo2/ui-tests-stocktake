@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 
 import pytest
+import requests
 from dotenv import load_dotenv
 from playwright.sync_api import Error as PlaywrightError
 from playwright.sync_api import sync_playwright, Page, Browser, BrowserContext
@@ -11,6 +12,7 @@ from pages.dashboard_page import DashboardPage
 from pages.login_page import LoginPage
 from pages.new_purchase_order_page import NewPurchaseOrderPage
 from pages.product_page import ProductPage
+from pages.purchase_order_history_page import PurchaseOrderHistoryPage
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 BASE_URL = "http://127.0.0.1:8000"
@@ -186,6 +188,25 @@ def test_context():
     return Ctx()
 
 
+@pytest.fixture
+def auth_headers():
+    login_url = f"{BASE_URL}/auth/login"
+    credentials = {
+        "email": "test_user@gmail.com",
+        "password": "Test600!"
+    }
+
+    response = requests.post(login_url, json=credentials)
+    assert response.status_code == 200, f"Login failed: {response.text}"
+
+    token = response.json().get("access_token")
+    assert token, "No access token returned"
+
+    return {
+        "Authorization": f"Bearer {token}"
+    }
+
+
 @pytest.fixture(scope="function")
 def login_page(page: Page) -> LoginPage:
     return LoginPage(page)
@@ -204,3 +225,8 @@ def product_page(page: Page) -> ProductPage:
 @pytest.fixture(scope="function")
 def new_purchase_order_page(page: Page) -> NewPurchaseOrderPage:
     return NewPurchaseOrderPage(page)
+
+
+@pytest.fixture(scope="function")
+def purchase_order_history_page(page: Page) -> PurchaseOrderHistoryPage:
+    return PurchaseOrderHistoryPage(page)

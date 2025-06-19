@@ -22,7 +22,6 @@ def dummy_test_step_no_params():
 @given("there is an existing product type")
 @when("the user submits the type form after filling correctly all required fields")
 def submit_after_filling_the_new_product_type_form(test_context, product_page):
-
     logging.info("Navigate to submodule from the Product Module from the Dashboard.")
     product_page.new_product_side_menu_button.click()
 
@@ -41,7 +40,6 @@ def submit_after_filling_the_new_product_type_form(test_context, product_page):
 @given("there is an existing product unit")
 @when("the user submits the unit form after filling correctly all required fields")
 def submit_after_filling_the_new_product_unit_form(test_context, product_page):
-
     logging.info("Navigate to submodule from the Product Module from the Dashboard.")
     product_page.new_product_side_menu_button.click()
 
@@ -61,7 +59,6 @@ def submit_after_filling_the_new_product_unit_form(test_context, product_page):
 @given("there is an existing product group")
 @when("the user submits the group form after filling correctly all required fields")
 def submit_after_filling_the_new_product_group_form(test_context, product_page):
-
     logging.info("Navigate to submodule from the Product Module from the Dashboard.")
     product_page.new_product_side_menu_button.click()
 
@@ -80,7 +77,6 @@ def submit_after_filling_the_new_product_group_form(test_context, product_page):
 @given("there is an existing product supplier")
 @when("the user submits the supplier form after filling correctly all required fields")
 def submit_after_filling_the_new_product_supplier_form(test_context, product_page):
-
     logging.info("Navigate to submodule from the Product Module from the Dashboard.")
     product_page.new_product_side_menu_button.click()
 
@@ -98,7 +94,6 @@ def submit_after_filling_the_new_product_supplier_form(test_context, product_pag
 
 @when("the user submits the product form after filling correctly all required fields")
 def submit_after_filling_the_new_product_supplier_form(test_context, product_page):
-
     logging.info("Navigate to submodule from the Product Module from the Dashboard.")
     product_page.new_product_side_menu_button.click()
 

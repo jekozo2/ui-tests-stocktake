@@ -15,6 +15,7 @@ class DashboardPage(BasePage):
         self.transfers_side_menu_button = page.locator("//div[@class='sidebar-menu']//span[text()='Transfers']")
         self.requests_side_menu_button = page.locator("//div[@class='sidebar-menu']//span[text()='Requests']")
         self.purchase_orders_side_menu_button = page.locator("#purchaseOrdersBtn")
+        self.purchase_orders_side_menu_caret = page.locator("#purchaseOrdersCaret")
         self.new_purchase_order_side_menu_button = page.locator(
             "//div[@id='purchaseSubmenu']//span[text()='New Purchase Order']")
         self.draft_purchase_orders_side_menu_button = page.locator(
