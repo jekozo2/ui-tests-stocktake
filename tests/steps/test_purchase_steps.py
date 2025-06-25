@@ -120,14 +120,48 @@ def populate_new_po_fields(new_purchase_order_page, test_context):
     test_context.new_purchase = purchase
 
 
+@given(parsers.parse("the user populates all Purchase Order fields without {empty_field}"))
+@when(parsers.parse("the user populates all Purchase Order fields without {empty_field}"))
+def populate_new_po_fields_without_one(new_purchase_order_page, test_context, empty_field: str):
+    logging.info(f"Populate new Purchase Order fields without {empty_field}")
+
+    # Set the quantity and cost for each product in the product list
+    for product in test_context.products_list:
+        product.quantity = random.randint(1, 20) if product.quantity is None else product.quantity
+        product.cost = float(random.randint(1, 10000) / 100) if product.cost is None else product.cost
+
+    purchase = Purchase(
+        supplier=test_context.products_list[0].supplier if empty_field != "supplier" else None,
+        purchase_date=datetime.now() if empty_field != "purchase date" else None,
+        purchase_type="Invoice" if empty_field != "purchase type" else None,
+        reference=f"INV_{random.randint(10000, 99999)}_{datetime.now()}" if empty_field != "reference" else None,
+        products=test_context.products_list,
+        unify_same_items=True
+    )
+
+    new_purchase_order_page.populate_new_purchase_order(purchase)
+
+    test_context.new_purchase = purchase
+
+
 @when("the user edits the Added Item from the Items List")
-def edit_added_item(test_context, new_purchase_order_page):
+def edit_added_item_from_current_purchase(test_context, new_purchase_order_page):
     new_purchase_order_page.edit_added_item(test_context)
+
+
+@when("the user deletes an Added Item from the Items List")
+def delete_added_item_from_current_purchase(test_context, new_purchase_order_page):
+    new_purchase_order_page.delete_added_item(test_context)
 
 
 @when("the user submits the Purchase Order")
 def submit_purchase_order(test_context, new_purchase_order_page):
     new_purchase_order_page.submit_purchase(test_context.new_purchase.reference)
+
+
+@when("the user saves the Purchase Order as Draft")
+def save_draft_purchase_order(test_context, new_purchase_order_page):
+    new_purchase_order_page.save_purchase_as_draft(test_context.new_purchase.reference)
 
 
 @when("the user checks the 'Unify same items' checkbox")
@@ -199,6 +233,42 @@ def validate_new_purchase_order_created(dashboard_page, purchase_order_history_p
     assert actual_created_date == expected_created_date, \
         (f"Expected created date {expected_created_date} to equal Actual: {actual_created_date} on Purchase Order "
          f"History page.")
+
+
+@then("the new Purchase Order is successfully saved as Draft")
+def validate_new_purchase_order_saved_as_draft(dashboard_page, draft_purchase_orders_page, test_context):
+    dashboard_page.draft_purchase_orders_side_menu_button.click()
+
+    actual_reference = draft_purchase_orders_page.last_saved_draft_purchase_reference.inner_text()
+    actual_supplier = draft_purchase_orders_page.last_saved_draft_purchase_supplier.inner_text()
+    actual_total = draft_purchase_orders_page.last_saved_draft_purchase_total.inner_text()[1:]
+    actual_created_date = draft_purchase_orders_page.last_saved_draft_purchase_created_date.inner_text()
+    actual_saved_date = draft_purchase_orders_page.last_saved_draft_purchase_date_saved.inner_text()[:10]
+
+    assert actual_reference == test_context.new_purchase.reference, \
+        (f"Expected draft purchase reference {test_context.new_purchase.reference} to equal "
+         f"Actual: {actual_reference} on Draft Purchase Orders page.")
+
+    expected_supplier_name = test_context.new_purchase.supplier['name']
+    assert actual_supplier == expected_supplier_name, \
+        (f"Expected purchase supplier {expected_supplier_name} to equal "
+         f"Actual: {actual_supplier} on Draft Purchase Orders page.")
+
+    expected_total = "{:.2f}".format(
+        sum(product.cost * product.quantity for product in test_context.new_purchase.products))
+    assert actual_total == expected_total, \
+        (f"Expected purchase total {expected_total} to equal "
+         f"Actual: {actual_total} on Draft Purchase Orders page.")
+
+    expected_created_date = datetime.now().strftime("%d/%m/%Y")
+    assert actual_created_date == expected_created_date, \
+        (f"Expected created date {expected_created_date} to equal "
+         f"Actual: {actual_created_date} on Draft Purchase Orders page.")
+
+    expected_saved_date = datetime.now().strftime("%d/%m/%Y")
+    assert actual_saved_date == expected_created_date, \
+        (f"Expected saved date {expected_saved_date} to equal "
+         f"Actual: {actual_saved_date} on Draft Purchase Orders page.")
 
 
 @then("the same items are merged into one")
@@ -274,3 +344,36 @@ def verify_edited_item_values(test_context, new_purchase_order_page):
             new_purchase_order_page.ADDED_PRODUCT_DELETE_ACTION_BY_TITLE.format(product.name)).all():
         expect(delete_btn).to_be_visible()
         expect(delete_btn).to_be_enabled()
+
+
+@then("the item has been deleted successfully")
+def verify_item_deleted(test_context, new_purchase_order_page):
+    item_to_delete = test_context.new_purchase.products[0]
+
+    # Get the total purchase when an added item has been moved to edit (Added Items list is with one item less)
+    purchase_total_after_item_deleted: float = float(new_purchase_order_page.purchase_total_value.inner_text())
+
+    actual_purchase_total_after_item_deleted = round(float(test_context.preliminary_purchase_total - (
+            float(item_to_delete.cost) * item_to_delete.quantity)), 2)
+    assert purchase_total_after_item_deleted == actual_purchase_total_after_item_deleted, \
+        (f"Expected {purchase_total_after_item_deleted} to equal"
+         f"Actual {actual_purchase_total_after_item_deleted}")
+
+    assert new_purchase_order_page.added_item_container.count() + 1 == test_context.preliminary_added_items_count, \
+        (f"Expected the number of added items to have decreased to {test_context.preliminary_added_items_count - 1} "
+         f"after clicking Delete Item, but got {new_purchase_order_page.added_item_container.count()}.")
+
+
+@then(parsers.parse("Purchase Order not created with error message: {expected_error_message}"))
+def verify_purchase_order_not_created_with_error_message(new_purchase_order_page,
+                                                         expected_error_message: str):
+    new_purchase_order_page.verify_error_message(expected_error_message)
+    new_purchase_order_page.purchase_cancel_button.click()
+
+
+@then("there is no Purchase Order without reference in Purchase Order History Page")
+def verify_no_purchase_order_without_reference_on_history_page(purchase_order_history_page, dashboard_page):
+    dashboard_page.purchase_orders_history_side_menu_button.click()
+
+    for reference in purchase_order_history_page.all_purchase_references.all():
+        expect(reference, "Expected all references in Purchase History not to be empty.").not_to_be_empty()
