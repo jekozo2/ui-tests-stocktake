@@ -9,6 +9,7 @@ from playwright.sync_api import Error as PlaywrightError
 from playwright.sync_api import sync_playwright, Page, Browser, BrowserContext
 
 from pages.dashboard_page import DashboardPage
+from pages.draft_purchase_orders_page import DraftPurchaseOrdersPage
 from pages.login_page import LoginPage
 from pages.new_purchase_order_page import NewPurchaseOrderPage
 from pages.product_page import ProductPage
@@ -230,3 +231,8 @@ def new_purchase_order_page(page: Page) -> NewPurchaseOrderPage:
 @pytest.fixture(scope="function")
 def purchase_order_history_page(page: Page) -> PurchaseOrderHistoryPage:
     return PurchaseOrderHistoryPage(page)
+
+
+@pytest.fixture(scope="function")
+def draft_purchase_orders_page(page: Page) -> DraftPurchaseOrdersPage:
+    return DraftPurchaseOrdersPage(page)

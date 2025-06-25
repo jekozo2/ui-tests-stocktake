@@ -217,6 +217,31 @@ class NewPurchaseOrderPage(BasePage):
 
         test_context.new_purchase.products.append(updated_product)
 
+    def delete_added_item(self, test_context):
+        item_to_delete = test_context.new_purchase.products[0]
+
+        logging.info(f"Delete the first existing in Items List added item with title {item_to_delete.name}.")
+
+        # Get the total purchase before moving added item to edit
+        test_context.preliminary_purchase_total = float(self.purchase_total_value.inner_text())
+
+        test_context.preliminary_added_items_count = self.added_item_container.count()
+
+        # Click on Delete Button for the first item in the list of added items
+        self.page.locator(self.ADDED_PRODUCT_DELETE_ACTION_BY_TITLE.format(item_to_delete.name)).click()
+
+        expect(self.supplier_dropdown).to_be_enabled() \
+            if self.added_item_container.count() == 0 \
+            else expect(self.supplier_dropdown).not_to_be_enabled()
+        expect(self.product_dropdown.locator("option:checked")).to_have_text("Select product")
+        expect(self.product_dropdown).to_be_enabled()
+        expect(self.product_unit_dropdown).not_to_be_enabled()
+        expect(self.product_quantity_input).to_be_enabled()
+        expect(self.product_quantity_input).to_have_value("")
+        expect(self.product_cost_input).to_be_enabled()
+        expect(self.product_cost_input).to_have_value("")
+        expect(self.product_cost_input).to_have_value("")
+
     def populate_new_purchase_order(self, purchase: Purchase):
         """
         The method is used to populate all provided data from a Purchase object into the New Purchase Order form.
