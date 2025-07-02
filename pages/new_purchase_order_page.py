@@ -283,7 +283,7 @@ class NewPurchaseOrderPage(BasePage):
             expect(self.product_unit_dropdown).not_to_be_enabled()
 
         if purchase.purchase_date is not None:
-            self.type_purchase_date(purchase.purchase_date.strftime("%d%m%Y"))
+            self.type_purchase_date(purchase.purchase_date.strftime("%m%d%Y"))
 
         if purchase.purchase_type is not None:
             self.select_purchase_type(purchase.purchase_type)
@@ -299,7 +299,7 @@ class NewPurchaseOrderPage(BasePage):
             total_purchase_order_amount = total_purchase_order_amount + (float(product.quantity) * float(product.cost))
 
         assert self.purchase_total_value.inner_text() == "{:.2f}".format(total_purchase_order_amount), \
-            f"Expected total Purchase Amount {":.2f".format(total_purchase_order_amount)} to equal Actual: {self.purchase_total_value.inner_text()}."
+            f"Expected total Purchase Amount {'{:.2f}'.format(total_purchase_order_amount)} to equal Actual: {self.purchase_total_value.inner_text()}."
 
     def fill_purchase_product_details(self, product: Product):
         """
@@ -322,7 +322,7 @@ class NewPurchaseOrderPage(BasePage):
             self.fill_cost(product.cost)
             assert self.product_total_field.input_value() == "{:.2f}".format(
                 float(product.quantity) * float(product.cost)), \
-                f"Expected product total {"{:.2f}".format(float(product.quantity) * float(product.cost))} to equal Actual: {self.product_total_field.input_value()}."
+                f"Expected product total {'{:.2f}'.format(float(product.quantity) * float(product.cost))} to equal Actual: {self.product_total_field.input_value()}."
 
     def fill_edit_purchase_product_details(self, product: Product):
         """

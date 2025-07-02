@@ -43,6 +43,7 @@ class ProductPage(DashboardPage):
         self.product_unit_dropdown = page.locator(self.PRODUCT_UNIT_DROPDOWN_SELECTOR)
         self.product_group_dropdown = page.locator(self.PRODUCT_GROUP_DROPDOWN_SELECTOR)
         self.product_supplier_dropdown = page.locator(self.PRODUCT_SUPPLIER_DROPDOWN_SELECTOR)
+        self.new_product_close_button = page.locator("//div[@id='newProductModal']//span[text()='×']")
 
     def create_new_type(self, product_type: ProductType):
         """
@@ -57,6 +58,7 @@ class ProductPage(DashboardPage):
         self.new_type_name_input.fill(product_type.name)
         self.new_type_description_input.fill(product_type.description)
         self.create_type_button.click()
+        self.new_product_close_button.click()
 
     def create_new_unit(self, product_unit: ProductUnit):
         """
@@ -72,6 +74,7 @@ class ProductPage(DashboardPage):
         self.new_unit_yield_input.fill(str(product_unit.unit_yield))
         self.new_unit_description_input.fill(product_unit.description)
         self.create_unit_button.click()
+        self.new_product_close_button.click()
 
     def create_new_group(self, product_group: ProductGroup):
         """
@@ -86,6 +89,8 @@ class ProductPage(DashboardPage):
         self.new_group_name_input.fill(product_group.name)
         self.new_group_description_input.fill(product_group.description)
         self.create_group_button.click()
+        self.new_product_close_button.click()
+
 
     def create_new_supplier(self, product_supplier: ProductSupplier):
         """
@@ -100,6 +105,8 @@ class ProductPage(DashboardPage):
         self.new_supplier_name_input.fill(product_supplier.name)
         self.new_supplier_email_input.fill(product_supplier.email)
         self.create_supplier_button.click()
+        self.new_product_close_button.click()
+
 
     def create_new_product(self, product: Product):
         """

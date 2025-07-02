@@ -47,9 +47,9 @@ def create_number_of_products(auth_headers, test_context, products):
     test_context.products_list = products_list
 
 
-@given(parsers.parse("{products: d} identical products are created"))
-@given(parsers.parse("{products: d} another product is created"))
-def create_number_of_identical_products(auth_headers, test_context, products):
+@given(parsers.re("(?P<products>\d+) identical products are created"))
+@given(parsers.re("(?P<products>\d+) another product is created"))
+def create_number_of_identical_products(auth_headers, test_context, products: int):
     logging.info(f"Create preliminary product data - {products} products")
 
     if getattr(test_context, "products_list", None) is None:
@@ -68,7 +68,7 @@ def create_number_of_identical_products(auth_headers, test_context, products):
     random_quantity = random.randint(1, 10)
     random_cost = "{:.2f}".format(random.randint(1, 10))
 
-    for _ in range(products):
+    for _ in range(int(products)):
         payload = {
             "name": f"Test_product_{random_number}",
             "type_id": type_id,
@@ -91,7 +91,7 @@ def open_new_purchase_modal(dashboard_page):
     logging.info("Open new purchase order modal")
     expect(dashboard_page.purchase_orders_side_menu_button).to_be_visible(timeout=5000)
     expect(dashboard_page.purchase_orders_side_menu_button).to_be_enabled(timeout=5000)
-    dashboard_page.purchase_orders_side_menu_button.hover()
+    dashboard_page.purchase_orders_side_menu_button.hover(timeout=30000)
     dashboard_page.purchase_orders_side_menu_button.click(force=True)
     dashboard_page.new_purchase_order_side_menu_button.click(force=True)
 
